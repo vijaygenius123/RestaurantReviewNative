@@ -1,15 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View, TextInput, FlatList } from 'react-native';
+import Header from 'components/Header';
+import RestaurantRow from './src/components/RestaurantRow';
 
 const App = () => {
+  const [search, setSearch] = useState('');
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
@@ -24,37 +19,26 @@ const App = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar />
       <View style={{ flex: 1 }}>
-        <Text style={styles.header}>Restaurant Review</Text>
-        {restaurants.map((restaurant, index) => (
-          <View key={restaurant.id} style={styles.row}>
-            <View style={styles.edges}>
-              <Text>{index + 1}</Text>
-            </View>
-            <View style={styles.nameAndAddress}>
-              <Text>{restaurant.name}</Text>
-              <Text style={styles.address}>
-                {restaurant.neighborhood} {restaurant.address}
-              </Text>
-            </View>
-            <View style={styles.edges}>
-              <Text>Info</Text>
-            </View>
-          </View>
-        ))}
+        <Header />
+        <TextInput
+          style={styles.input}
+          placeholder={'Search'}
+          onChangeText={text => setSearch(text)}
+        />
+        <FlatList
+          data={restaurants.filter(place => {
+            return !search || place.name.toLowerCase().indexOf(search.toLowerCase()) > -1;
+          })}
+          renderItem={({ item, index }) => <RestaurantRow restaurant={item} index={index} />}
+          keyExtractor={item => item.name}
+          initialNumToRender={5}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    color: '#0066cc',
-    fontSize: 30,
-    fontWeight: '300',
-  },
   row: {
     flexDirection: 'row',
   },
@@ -69,6 +53,16 @@ const styles = StyleSheet.create({
   },
   address: {
     color: 'gray',
+  },
+  input: {
+    marginBottom: 30,
+    padding: 10,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    color: '#444',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#f5f5f5',
   },
 });
 
